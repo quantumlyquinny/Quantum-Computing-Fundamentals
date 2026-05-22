@@ -1,5 +1,7 @@
 # Quantum Computing Fundamentals: BB84 QKD & Threat Simulation
+> ⚡ **Live Interactive Demo:** [Launch the BB84 Protocol Visualizer](https://quantumlyquinny.github.io/Quantum-Computing-Fundamentals/visualizer/)
 
+> *A custom vanilla JS front-end simulating the mathematical state collapses and QBER detection of the BB84 protocol.*
 This repository serves as a foundational sandbox for quantum computing concepts, culminating in a simulation of the **BB84 Quantum Key Distribution (QKD) protocol** and an applied eavesdropper threat model.
 
 Built using IBM's Qiskit framework, the project demonstrates the mathematical principles of quantum state preparation, superposition, entanglement, and cryptographic key sifting.

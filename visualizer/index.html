@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BB84 Protocol Simulator</title>
+    <style>
+        :root {
+            --bg-main: #0a0e17;
+            --bg-panel: #111827;
+            --border: #1f2937;
+            --text-main: #e5e7eb;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            padding: 40px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            background: linear-gradient(to right, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .controls {
+            background: var(--bg-panel);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="range"] {
+            accent-color: var(--accent-cyan);
+            cursor: pointer;
+        }
+
+        .eve-toggle-label {
+            color: var(--accent-purple);
+            text-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+            border: 1px solid var(--accent-purple);
+            padding: 8px 15px;
+            border-radius: 8px;
+            background: rgba(139, 92, 246, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .eve-toggle-label:hover {
+            background: rgba(139, 92, 246, 0.15);
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--accent-cyan), #3b82f6);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+        }
+
+        .grid-container {
+            display: grid;
+            gap: 4px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            padding: 4px;
+        }
+
+        .cell {
+            background: var(--bg-panel);
+            padding: 15px 10px;
+            text-align: center;
+            font-family: 'Fira Code', monospace;
+            font-size: 18px;
+            border-radius: 4px;
+            opacity: 0;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .row-header {
+            background: rgba(31, 41, 55, 0.8);
+            font-weight: 600;
+            text-align: right;
+            padding-right: 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #9ca3af;
+        }
+
+        .match { 
+            background: rgba(16, 185, 129, 0.15); 
+            color: var(--accent-green); 
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+            font-weight: bold; 
+        }
+
+        .error { 
+            background: rgba(239, 68, 68, 0.15); 
+            color: var(--accent-red); 
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+            font-weight: bold; 
+            box-shadow: inset 0 0 0 1px var(--accent-red);
+        }
+
+        .eve-row { 
+            color: var(--accent-purple); 
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .stats {
+            margin-top: 30px;
+            padding: 30px;
+            background: var(--bg-panel);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            text-align: center;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .warning-box {
+            color: var(--accent-red);
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .safe-box {
+            color: var(--accent-green);
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .stat-metric {
+            font-size: 2rem;
+            font-weight: bold;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Quantum Key Distribution (BB84)</h1>
+    
+    <div class="controls">
+        <label>
+            Qubits Transmitted: 
+            <input type="range" id="numBits" min="8" max="32" value="16" oninput="document.getElementById('bitCount').innerText = this.value">
+            <span id="bitCount" style="color: var(--accent-cyan); font-family: monospace; font-size: 1.2rem;">16</span>
+        </label>
+        <label class="eve-toggle-label">
+            <input type="checkbox" id="eveToggle"> Inject Eavesdropper (Eve)
+        </label>
+        <button onclick="simulate()">Initialize Transmission</button>
+    </div>
+
+    <div id="simulation-board" class="grid-container"></div>
+    <div id="stats-board" class="stats"></div>
+
+    <script>
+        const randBit = () => Math.floor(Math.random() * 2);
+        const bases = ['+', '×'];
+
+        function simulate() {
+            const numBits = parseInt(document.getElementById('numBits').value);
+            const eveActive = document.getElementById('eveToggle').checked;
+
+            let aliceBits = [], aliceBases = [], eveBases = [], eveMeasured = [];
+            let bobBases = [], bobMeasured = [], siftedAlice = [], siftedBob = [];
+            let isSifted = [], errors = 0;
+
+            for (let i = 0; i < numBits; i++) {
+                aliceBits.push(randBit());
+                aliceBases.push(randBit()); 
+
+                let currentBit = aliceBits[i];
+                let currentBasis = aliceBases[i];
+
+                if (eveActive) {
+                    let eBase = randBit();
+                    eveBases.push(eBase);
+                    eveMeasured.push(eBase === currentBasis ? currentBit : randBit());
+                    
+                    currentBit = eveMeasured[i];
+                    currentBasis = eBase;
+                }
+
+                let bBase = randBit();
+                bobBases.push(bBase);
+                bobMeasured.push(bBase === currentBasis ? currentBit : randBit());
+
+                let keep = aliceBases[i] === bobBases[i];
+                isSifted.push(keep);
+                
+                if (keep) {
+                    siftedAlice.push(aliceBits[i]);
+                    siftedBob.push(bobMeasured[i]);
+                    if (aliceBits[i] !== bobMeasured[i]) errors++;
+                }
+            }
+
+            renderBoard(numBits, aliceBits, aliceBases, eveActive, eveBases, eveMeasured, bobBases, bobMeasured, isSifted, siftedAlice, siftedBob, errors);
+        }
+
+        function renderBoard(numBits, aBits, aBases, eveActive, eBases, eBits, bBases, bBits, isSifted, sAlice, sBob, errors) {
+            const board = document.getElementById('simulation-board');
+            board.innerHTML = '';
+            board.style.gridTemplateColumns = `220px repeat(${numBits}, 1fr)`;
+
+            const addRow = (title, data, cssClass = '', checkMatch = null, delayOffset = 0) => {
+                let html = `<div class="cell row-header ${cssClass}" style="animation-delay: ${delayOffset}s; opacity: 0;">${title}</div>`;
+                for (let i = 0; i < numBits; i++) {
+                    let cellClass = 'cell';
+                    let content = data[i];
+                    
+                    if (checkMatch === 'sifting' && isSifted[i]) {
+                        cellClass += ' match';
+                    } else if (checkMatch === 'bobMeasure' && isSifted[i] && aBits[i] !== bBits[i]) {
+                        cellClass += ' error'; 
+                    }
+                    
+                    if (content === undefined || (!isSifted[i] && checkMatch === 'siftedResult')) content = '·';
+                    
+                    // Stagger the animation from left to right, top to bottom
+                    let cellDelay = delayOffset + (i * 0.03);
+                    html += `<div class="${cellClass} ${cssClass}" style="animation-delay: ${cellDelay}s; opacity: 0;">${content}</div>`;
+                }
+                board.innerHTML += html;
+            };
+
+            let rowDelay = 0;
+            addRow("Alice's Raw Bits", aBits, '', null, rowDelay); rowDelay += 0.2;
+            addRow("Alice's Basis", aBases.map(b => bases[b]), '', null, rowDelay); rowDelay += 0.2;
+            
+            if (eveActive) {
+                addRow("Eve's Basis", eBases.map(b => bases[b]), 'eve-row', null, rowDelay); rowDelay += 0.2;
+                addRow("Eve's Measurement", eBits, 'eve-row', null, rowDelay); rowDelay += 0.2;
+            }
+
+            addRow("Bob's Basis", bBases.map(b => bases[b]), '', 'sifting', rowDelay); rowDelay += 0.2;
+            addRow("Bob's Measurement", bBits, '', 'bobMeasure', rowDelay); rowDelay += 0.2;
+            addRow("Final Sifted Key", bBits, 'match', 'siftedResult', rowDelay);
+
+            const qber = sAlice.length > 0 ? ((errors / sAlice.length) * 100).toFixed(2) : 0;
+            const stats = document.getElementById('stats-board');
+            
+            setTimeout(() => {
+                if (qber > 0) {
+                    stats.innerHTML = `
+                        <div class="warning-box">
+                            <strong>⚠️ CRITICAL ALARM: Channel Compromised</strong><br>
+                            Eavesdropper forced a quantum state collapse during transmission.
+                            <div class="stat-metric">${qber}% QBER</div>
+                            ACTION: Protocol Aborted. Keys Discarded.
+                        </div>`;
+                } else {
+                    stats.innerHTML = `
+                        <div class="safe-box">
+                            <strong>✅ SUCCESS: Secure Channel Verified</strong><br>
+                            Zero waveform collapse detected during classical sifting phase.
+                            <div class="stat-metric">0.00% QBER</div>
+                            ACTION: ${sAlice.length} bits retained for cryptographic encryption.
+                        </div>`;
+                }
+            }, (rowDelay + (numBits * 0.03)) * 1000); // Wait for grid animation to finish before showing stats
+        }
+
+        simulate();
+    </script>
+</body>
+</html>
