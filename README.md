@@ -38,3 +38,26 @@ During the classical sifting phase, Alice and Bob compare a subset of their keys
 A Quantum Bit Error Rate (QBER) above ~11% statistically proves the channel is compromised.
 `06_bb84_eavesdropper.py` simulates this end-to-end and **automatically aborts the
 protocol** when the QBER threshold is exceeded.
+
+## Interactive Visualizer
+
+The [live demo](https://quantumlyquinny.github.io/Quantum-Computing-Fundamentals/visualizer/)
+is a custom vanilla JS front-end that visualises quantum state collapses and QBER
+detection in real time — no installation required.
+
+## Setup
+
+```bash
+git clone https://github.com/quantumlyquinny/Quantum-Computing-Fundamentals
+cd Quantum-Computing-Fundamentals
+pip install qiskit qiskit-aer matplotlib pylatexenc numpy
+
+# Run the full BB84 eavesdropper simulation
+python 06_bb84_eavesdropper.py
+```
+
+## Background Reading
+
+If you're new to QKD, these resources build the intuition well:
+- [IBM Qiskit Textbook — Quantum Protocols](https://learn.qiskit.org)
+- [BB84 original paper — Bennett & Brassard, 1984](https://arxiv.org/abs/2003.06557)
