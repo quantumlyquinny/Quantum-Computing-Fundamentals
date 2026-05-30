@@ -1,33 +1,40 @@
 # Quantum Computing Fundamentals: BB84 QKD & Threat Simulation
-> ⚡ **Live Interactive Demo:** [Launch the BB84 Protocol Visualizer](https://quantumlyquinny.github.io/Quantum-Computing-Fundamentals/visualizer/)
 
-> *A custom vanilla JS front-end simulating the mathematical state collapses and QBER detection of the BB84 protocol.*
-This repository serves as a foundational sandbox for quantum computing concepts, culminating in a simulation of the **BB84 Quantum Key Distribution (QKD) protocol** and an applied eavesdropper threat model.
+![Python](https://img.shields.io/badge/Python-3.11-blue.svg)
+![Qiskit](https://img.shields.io/badge/Qiskit-IBM-6929EE.svg)
+![JavaScript](https://img.shields.io/badge/Visualizer-Vanilla%20JS-yellow.svg)
+![License](https://img.shields.io/badge/License-MIT-purple.svg)
 
-Built using IBM's Qiskit framework, the project demonstrates the mathematical principles of quantum state preparation, superposition, entanglement, and cryptographic key sifting.
+⚡ **[Launch the Interactive BB84 Visualizer →](https://quantumlyquinny.github.io/Quantum-Computing-Fundamentals/visualizer/)**
 
-## Project Architecture
+A progressive quantum computing sandbox built with IBM's Qiskit framework, culminating
+in a simulation of the BB84 Quantum Key Distribution (QKD) protocol with a live
+eavesdropper threat model. Presented in an academic setting as an introduction to
+quantum cryptographic principles.
 
-The repository progresses from fundamental single-qubit operations to composite entangled systems, and finally to applied quantum cryptography:
+## What This Covers
 
-1. `01_superposition.py`: Demonstrates basic Hadamard gate application and statistical measurement.
-2. `02_entanglement_bell_state.py`: Generates a standard Bell State using H and CNOT gates.
-3. `03_superposition_bloch.py`: Visualizes pre-measurement state vectors mathematically.
-4. `04_entanglement_bloch.py`: Visualizes perfectly mixed states to demonstrate the No-Cloning theorem.
-5. `05_bb84_baseline.py`: Simulates a secure, peer-to-peer BB84 QKD transmission resulting in a perfect shared key (0.00% QBER).
-6. `06_bb84_eavesdropper.py`: Injects an intercept-resend attack (Man-in-the-Middle) into the transmission.
+The repository builds from single-qubit fundamentals to applied quantum cryptography
+in six progressive scripts:
 
-## Threat Detection (QBER)
+| Script | Concept |
+|---|---|
+| `01_superposition.py` | Hadamard gate + statistical measurement |
+| `02_entanglement_bell_state.py` | Bell State via H + CNOT gates |
+| `03_superposition_bloch.py` | Pre-measurement state vector visualisation |
+| `04_entanglement_bloch.py` | Mixed states + No-Cloning theorem |
+| `05_bb84_baseline.py` | Secure BB84 transmission — 0.00% QBER |
+| `06_bb84_eavesdropper.py` | Intercept-resend attack + automatic abort |
 
-The eavesdropper simulation explicitly models the physics of a quantum attack. Because an eavesdropper (Eve) must measure the traveling qubits to read them, she forces the quantum state to collapse. 
+## The Eavesdropper Threat Model
 
-When she guesses the incorrect measurement basis (which happens ~50% of the time), she permanently alters the qubit before passing it to Bob. This mathematically guarantees an approximate **25-35% Quantum Bit Error Rate (QBER)** during the classical sifting phase. The `06_bb84_eavesdropper.py` script automatically calculates this QBER and triggers a protocol abort if the channel is compromised.
+The core insight of BB84 is that eavesdropping is **physically detectable**.
 
-## Requirements
+When Eve intercepts a qubit, she must measure it — which forces a quantum state collapse.
+Since she guesses the correct measurement basis only ~50% of the time, she permanently
+corrupts ~25% of transmitted qubits before forwarding them to Bob.
 
-To run these simulations locally, ensure you have Python installed alongside the following dependencies:
-* `qiskit`
-* `qiskit-aer`
-* `matplotlib`
-* `pylatexenc` (Required for Matplotlib circuit visualizations)
-* `numpy`
+During the classical sifting phase, Alice and Bob compare a subset of their keys.
+A Quantum Bit Error Rate (QBER) above ~11% statistically proves the channel is compromised.
+`06_bb84_eavesdropper.py` simulates this end-to-end and **automatically aborts the
+protocol** when the QBER threshold is exceeded.
